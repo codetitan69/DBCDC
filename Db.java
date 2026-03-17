@@ -1,5 +1,4 @@
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +33,7 @@ public class Db {
     }
 
 
-    public static Map<String,Object> getSrc_First_Row(String query) throws SQLException {
+    public static Map<String,Object> getSrc_Row_Schema(String query) throws SQLException {
         query = query.replaceAll(";","") + " FETCH FIRST 1 ROW ONLY";
 
         PreparedStatement pstmt = SRC_DB_CONN.prepareStatement(query);
@@ -52,7 +51,7 @@ public class Db {
                 String colName = meta.getColumnName(i);
                 Object value = result.getObject(i);
 
-                column_data_map.put(colName,value);
+                column_data_map.put(colName,value.getClass());
             }
         }
         return column_data_map;

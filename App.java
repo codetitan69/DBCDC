@@ -2,13 +2,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class App {
-    public static void main(String[] args){
+    public static void main(String[] args) throws SQLException {
         Config.Load();
         Db.Load();
-        try {
-            Db.getSrc_First_Row(Config.getTABLES_AND_QUERIES().get("DB2ADMIN.TEST_EVENTS"));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        Esp.start();
     }
 }
