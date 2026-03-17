@@ -30,6 +30,8 @@ public class Db {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        System.out.println("Db connections successful");
     }
 
 

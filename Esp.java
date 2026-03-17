@@ -27,11 +27,13 @@ public class Esp {
         schemas_map.forEach((eventname,schema_map) -> {
             configuration.getCommon().addEventType(eventname,schema_map);
         });
+        System.out.println("events registered succesfully");
 
         CompilerArguments argss = new CompilerArguments(configuration);
-
         ArrayList<String> statements = getSelectStmtsForEvents(schemas_map);
         ArrayList<EPCompiled> cpld_stmts = getCompiledStmts(statements,argss);
+
+        System.out.println("statements compiled succesfully");
 
         runtime = deploymentsStmts(cpld_stmts,configuration);
     }

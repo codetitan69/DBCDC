@@ -41,6 +41,8 @@ public class Config {
         for (String q : query) {
             TABLES_AND_QUERIES.put(q.split(">")[0].trim(),q.split(">")[1].trim());
         }
+
+        System.out.println("Config Loaded");
     }
 
     public static String getSRC_DB_URL() {return SRC_DB_URL;}
