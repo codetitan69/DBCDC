@@ -36,7 +36,7 @@ public class Esp {
 
         System.out.println("statements compiled succesfully");
 
-        deployments = deploymentsStmts(cpld_stmts,configuration);
+        deployments = deployStmts(cpld_stmts,configuration);
     }
 
     public static Map<String,Map<String,Object>> getSchemaMaps(){
@@ -75,7 +75,7 @@ public class Esp {
         return compiled_list;
     }
 
-    public static ArrayList<EPDeployment> deploymentsStmts(ArrayList<EPCompiled> copiled_stmts,Configuration config){
+    public static ArrayList<EPDeployment> deployStmts(ArrayList<EPCompiled> copiled_stmts,Configuration config){
         EPRuntime rtime = EPRuntimeProvider.getDefaultRuntime(config);
         ArrayList<EPDeployment> deployments = new ArrayList<>();
 
@@ -101,5 +101,9 @@ public class Esp {
                     }
                 }
         );
+    }
+
+    public static void addListeners(){
+
     }
 }
