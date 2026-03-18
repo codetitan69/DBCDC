@@ -1,6 +1,5 @@
 import com.espertech.esper.compiler.client.EPCompileException;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,13 +14,10 @@ public class App {
         Esp.start();
 
         while (true){
-            Map<String, ResultSet> resultsetmap = Db.getSrcQueryResultSets();
-            resultsetmap.forEach((Str,v) -> {System.out.println(Str + v.toString());});
-            Map<String, ArrayList<Map<String,Object>>> qrResults = Db.getSrcResultMaps(resultsetmap);
+            Map<String, ArrayList<Map<String,Object>>> resultsetmap = Db.getSrcQueryResults();
 
             System.out.println("results from table extracted");
-            Esp.sendEvents(qrResults);
-
+            Esp.sendEvents(resultsetmap);
             System.out.println("events sent to runtime");
 
             try {

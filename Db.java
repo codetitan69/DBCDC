@@ -1,7 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Db {
@@ -61,52 +60,39 @@ public class Db {
         return column_data_map;
     }
 
-    public static Map<String,ResultSet> getSrcQueryResultSets(){
-        Map<String,ResultSet> res = new HashMap<>();
+    public static Map<String,ArrayList<Map<String,Object>>> getSrcQueryResults(){
+        Map<String,ArrayList<Map<String,Object>>> mp = new HashMap<>();
+
         Config.getTABLES_AND_QUERIES().forEach((String t,String v) -> {
-            try {
-                PreparedStatement stmt = SRC_DB_CONN.prepareStatement(v);
+            try(PreparedStatement stmt = SRC_DB_CONN.prepareStatement(v);
+                ) {
+
                 stmt.execute();
-                ResultSet result = stmt.getResultSet();
-                res.put(t,result);
+                try (ResultSet result = stmt.getResultSet();) {
+
+                    ResultSetMetaData meta = result.getMetaData();
+                    int columnCount = meta.getColumnCount();
+
+                    ArrayList<Map<String, Object>> table_rows = new ArrayList<>();
+
+                    while (result.next()) {
+                        Map<String, Object> row = new HashMap<>();
+                        for (int i = 1; i <= columnCount; i++) {
+
+                            String colName = meta.getColumnName(i);
+                            Object value = result.getObject(i);
+
+                            row.put(colName, value);
+                        }
+                        table_rows.add(row);
+                    }
+
+                    mp.put(t, table_rows);
+                }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         });
-        return res;
-    }
-
-    public static Map<String,ArrayList<Map<String,Object>>> getSrcResultMaps(Map<String,ResultSet> resultSetMap){
-
-        Map<String,ArrayList<Map<String,Object>>> mp = new HashMap<>();
-        resultSetMap.forEach(
-                (table_name,resultSet) -> {
-
-                    try {
-                        ResultSetMetaData meta = resultSet.getMetaData();
-                        int columnCount = meta.getColumnCount();
-
-                        ArrayList<Map<String,Object>> table_rows = new ArrayList<>();
-
-                        while(!resultSet.next()){
-                            Map<String,Object> row = new HashMap<>();
-                            for (int i = 1; i <= columnCount; i++) {
-
-                                String colName = meta.getColumnName(i);
-                                Object value = resultSet.getObject(i);
-
-                                row.put(colName,value);
-                            }
-                            table_rows.add(row);
-                        }
-
-                        mp.put(table_name,table_rows);
-                    } catch (RuntimeException | SQLException e){
-                            throw new RuntimeException(e);
-                    }
-                }
-        );
-
         return mp;
     }
 
