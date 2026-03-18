@@ -15,7 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Esp {
-    public static ArrayList<EPDeployment> runtime;
+    public static ArrayList<EPDeployment> deployments;
+    public static EPRuntime runtime;
     public static EPCompiler compiler;
 
     public static void start() throws SQLException, EPCompileException {
@@ -35,7 +36,7 @@ public class Esp {
 
         System.out.println("statements compiled succesfully");
 
-        runtime = deploymentsStmts(cpld_stmts,configuration);
+        deployments = deploymentsStmts(cpld_stmts,configuration);
     }
 
     public static Map<String,Map<String,Object>> getSchemaMaps(){
@@ -75,12 +76,12 @@ public class Esp {
     }
 
     public static ArrayList<EPDeployment> deploymentsStmts(ArrayList<EPCompiled> copiled_stmts,Configuration config){
-        EPRuntime runtime = EPRuntimeProvider.getDefaultRuntime(config);
+        EPRuntime rtime = EPRuntimeProvider.getDefaultRuntime(config);
         ArrayList<EPDeployment> deployments = new ArrayList<>();
 
         for (EPCompiled c:copiled_stmts){
             try {
-                deployments.add(runtime.getDeploymentService().deploy(c));
+                deployments.add(rtime.getDeploymentService().deploy(c));
                 System.out.println("deployed_successfully");
             }
             catch (EPDeployException ex) {
@@ -88,6 +89,17 @@ public class Esp {
             }
         }
 
+        runtime = rtime;
         return deployments;
+    }
+
+    public static void sendEvents(Map<String,ArrayList<Map<String,Object>>> tableResults){
+        tableResults.forEach(
+                (eventName,tableRes) -> {
+                    for(Map<String,Object> row : tableRes){
+                        runtime.getEventService().sendEventMap(row, eventName);
+                    }
+                }
+        );
     }
 }
